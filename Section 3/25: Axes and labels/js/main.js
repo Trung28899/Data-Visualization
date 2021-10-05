@@ -4,9 +4,9 @@
  *    3.10 - Axes and labels
  */
 
-const MARGIN = { LEFT: 100, RIGHT: 10, TOP: 10, BOTTOM: 130 };
-const WIDTH = 600 - MARGIN.LEFT - MARGIN.RIGHT;
-const HEIGHT = 400 - MARGIN.TOP - MARGIN.BOTTOM;
+const MARGIN = { LEFT: 100, RIGHT: 100, TOP: 150, BOTTOM: 150 };
+const WIDTH = 800 - MARGIN.LEFT - MARGIN.RIGHT;
+const HEIGHT = 600 - MARGIN.TOP - MARGIN.BOTTOM;
 
 const svg = d3
   .select("#chart-area")
@@ -18,16 +18,16 @@ const g = svg
   .append("g")
   .attr("transform", `translate(${MARGIN.LEFT}, ${MARGIN.TOP})`);
 
-// Label for X axis
+// X label
 g.append("text")
   .attr("class", "x axis-label")
   .attr("x", WIDTH / 2)
-  .attr("y", HEIGHT + 125)
+  .attr("y", HEIGHT + 110)
   .attr("font-size", "20px")
   .attr("text-anchor", "middle")
   .text("The word's tallest buildings");
 
-// Label in Y axis
+// Y label
 g.append("text")
   .attr("class", "y axis-label")
   .attr("x", -(HEIGHT / 2))
@@ -44,11 +44,7 @@ d3.json("data/buildings.json").then((data) => {
 
   const x = d3
     .scaleBand()
-    .domain(
-      data.map((d) => {
-        return d.name;
-      })
-    )
+    .domain(data.map((d) => d.name))
     .range([0, WIDTH])
     .paddingInner(0.3)
     .paddingOuter(0.2);
@@ -58,26 +54,24 @@ d3.json("data/buildings.json").then((data) => {
     .domain([0, d3.max(data, (d) => d.height)])
     .range([0, HEIGHT]);
 
-  // X axis generating
-  const xAxisCall = d3.axisBottom(x);
+  // axes generating
+  const leftAxis = d3
+    .axisLeft(y)
+    .ticks(5)
+    .tickFormat((d) => d + "m");
+  const bottom = d3.axisBottom(x);
 
+  // Styling Ticks and Lables for each Ticks
+  g.append("g").attr("class", "left axis").call(leftAxis);
   g.append("g")
-    .attr("class", "x axis")
+    .attr("class", "bottom axis")
     .attr("transform", `translate(0, ${HEIGHT})`)
-    .call(xAxisCall)
+    .call(bottom)
     .selectAll("text")
     .attr("y", "10")
     .attr("x", "-5")
     .attr("text-anchor", "end")
-    .attr("transform", "rotate(-40)");
-
-  // Y axis generating
-  const yAxisCall = d3
-    .axisLeft(y)
-    .ticks(3)
-    .tickFormat((d) => d + "m");
-
-  g.append("g").attr("class", "y axis").call(yAxisCall);
+    .attr("transform", "rotate(-30)");
 
   const rects = g.selectAll("rect").data(data);
 

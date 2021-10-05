@@ -101,5 +101,10 @@ Full documentation: https://github.com/d3/d3-axis/blob/v3.0.0/README.md#axisTop
 - Tick Sizing and Spacing:
   https://drive.google.com/file/d/1fACWS7OQ4iVr4ve1Xiw43xpfBsBrcDQq/view?usp=sharing
 
-- Label and other ticket methods:
+- Label and other tick methods:
   https://drive.google.com/file/d/1xRFEAfVoC1_sH4rSm55xPQChZ8L_ZYM9/view?usp=sharing
+
+26: Making a Bar Chart:
+
+- Flipping the domain to get the bar renders correctly
+- Having further X-axis label options
