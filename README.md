@@ -1,3 +1,46 @@
+## SECTION 4: BASIC OF DESIGN
+
+1.  Design Principles
+
+    a. Key aim to design data visualization (KEY TAKEAWAY):
+
+        - Make data easy to interpret
+        - Build credible visualizations
+        - Keep the focus on the important factors
+
+    b. Edward Tufte's Design Principles (Video 31):
+
+    Edward Tufte is the pinoneer in Data Visualization
+
+        - Graphical Integrity:
+            +, Present data ratio correctly. Do not find a way to exaggerate the data
+                (see in 1:08 video 31)
+        - The Lie Factor:
+            +, not sure about this one
+        - Chart Junk:
+            +, Any element in the screen that distract user from the data
+        - Data to ink ratio:
+            +, A Ratio to measure the amount of a chart junk a data visualization has
+
+2.  Design Toolkits:
+
+    a. Types of data: - Quantitative (numerical):
+    e.g: 1,2,3,etc... - Categorical (category):
+    e.g: African, Asisan, male, female, etc... - Ordinal (rankings):
+    e.g: big, small, tall, short, etc...
+
+    Here is the order of human ability to recognize order:
+    Numbers (easiest) > Ranking (Low, Medium, High) > Categories (household, individual, family) (Hardest)
+
+    b. Color selection: - Don't use 5 - 8 colours for categories - Consider color-blind users (~5% of population)
+
+        Color-blind friendly color scheme:
+        ColorBrewer2.org
+
+    c. How to sketch an idea to paper > see video 35
+
+=========================================================================
+
 ## SECTION 3: SCALES AND AXES (MAKING A BAR CHART)
 
 ## Terminologies:
