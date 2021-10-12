@@ -1,3 +1,6 @@
+https://docs.google.com/document/d/1pjG-shhQA6TnD9QMZbbwZH_6IDIVXCqHIscBWunFVko/edit?usp=sharing
+NOTE: The images are in trevortrinh28899@gmail.com drive: Public/Data Visualization/Section 3
+
 ## SECTION 4: BASIC OF DESIGN
 
 1.  Design Principles
@@ -66,8 +69,6 @@
 ## Course Content: Part 1: Scales, Part 2: margin, groups and making a bar chart
 
 ## PART 1: SCALES
-
-NOTE: The images are in trevortrinh28899@gmail.com drive: Public/Data Visualization/Section 3
 
 18: Linear Scale
 
