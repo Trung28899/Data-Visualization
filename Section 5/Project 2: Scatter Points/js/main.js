@@ -5,8 +5,8 @@
  */
 
 const MARGIN = { LEFT: 100, RIGHT: 10, TOP: 10, BOTTOM: 100 };
-const WIDTH = 600 - MARGIN.LEFT - MARGIN.RIGHT;
-const HEIGHT = 400 - MARGIN.TOP - MARGIN.BOTTOM;
+const WIDTH = 800 - MARGIN.LEFT - MARGIN.RIGHT;
+const HEIGHT = 500 - MARGIN.TOP - MARGIN.BOTTOM;
 
 // Setting up the chart area
 const svg = d3
@@ -41,9 +41,29 @@ const yLabel = g
   .attr("transform", "rotate(-90)")
   .text("Life Expectancy (Years)");
 
+// Year Label:
+const timeLabel = g
+  .append("text")
+  .attr("y", HEIGHT - 10)
+  .attr("x", WIDTH - 40)
+  .attr("font-size", "40px")
+  .attr("opacity", "0.4")
+  .attr("text-anchor", "middle")
+  .text("1800");
+
+// const maxXDomain = d3.max(fullData, (d) => {
+//   // getting max income in a year of all countries to get max income all time
+//   const maxInAYear = d3.max(d.countries, (country) => country.income);
+//   return maxInAYear;
+// });
+
 // Setting up scales:
-const x = d3.scaleLinear().range([0, WIDTH]);
-const y = d3.scaleLinear().range([HEIGHT, 0]);
+const x = d3.scaleLog().base(10).range([0, WIDTH]).domain([142, 180000]);
+const y = d3.scaleLinear().range([HEIGHT, 0]).domain([0, 90]);
+const ordinalScale = d3
+  .scaleOrdinal()
+  .range(d3.schemeAccent)
+  .domain(["europe", "asia", "americas", "africa"]);
 
 // Setting up axes:
 const xAxisGroup = g
@@ -54,63 +74,67 @@ const xAxisGroup = g
 const yAxisGroup = g.append("g").attr("class", "y axis");
 
 d3.json("data/data.json").then(function (data) {
-  const vietData = [];
   let counter = 0;
+
   data.forEach((d) => {
     d.year = Number(d.year);
-    const dataObject = d.countries.filter(
-      (country) => country.country === "Canada"
-    );
-    vietData.push({ year: d.year, data: dataObject[0] });
   });
 
-  // const maxIncome = d3.max(vietData, (d) => d.data["income"]);
-
   d3.interval(() => {
-    update(vietData[counter], vietData, counter);
-    if (counter < vietData.length - 1) {
+    update(data[counter], data);
+    if (counter < data.length - 1) {
       counter++;
     } else {
       counter = 0;
     }
   }, 100);
 
-  update(vietData[counter], vietData, counter);
+  update(data[counter], data);
 });
 
-function update(data, fullData, counter) {
-  const transit = d3.transition().duration(50);
+function update(data) {
+  const transit = d3.transition().duration(80);
 
-  x.domain([0, d3.max(fullData, (d) => d.data["income"])]);
-  y.domain([0, d3.max(fullData, (d) => d.data["life_exp"])]);
-
-  const xAxisCall = d3.axisBottom(x).ticks(10);
+  const xAxisCall = d3
+    .axisBottom(x)
+    .tickValues([400, 4000, 40000])
+    .tickFormat(d3.format("$"));
   xAxisGroup.transition(transit).call(xAxisCall);
 
   const yAxisCall = d3.axisLeft(y).ticks(10);
   yAxisGroup.transition(transit).call(yAxisCall);
 
   // JOIN new data with old elements.
-  const rects = g.selectAll("circle").data([data]);
+  const rects = g.selectAll("circle").data(data.countries, (d) => d.country);
 
   // EXIT old elements not present in new data.
   rects.exit().remove();
 
   // UPDATE old elements present in new data
   rects
-    .attr("cy", (d) => {
-      return y(d.data.life_exp);
-    })
-    .attr("cx", (d) => x(d.data.income))
     .transition(transit)
-    .attr("fill", "blue");
+    .attr("cy", (d) => {
+      return y(d.life_exp);
+    })
+    .attr("cx", (d) => {
+      const returnValue = x(d.income) || 0;
+      return returnValue;
+    })
+    .attr("fill", (d) => ordinalScale(d.continent));
 
   // ENTER new elements present in new data...
   rects
     .enter()
     .append("circle")
-    .attr("fill", "grey")
-    .attr("cx", x(data.data.income))
-    .attr("cy", y(data.data.life_exp))
+    .attr("fill", (d) => ordinalScale(d.continent))
+    .attr("cx", (d) => {
+      const returnValue = x(d.income) || 0;
+      return returnValue;
+    })
+    .attr("cy", (d) => {
+      return y(d.life_exp);
+    })
     .attr("r", 5);
+
+  timeLabel.text(String(data.year));
 }
