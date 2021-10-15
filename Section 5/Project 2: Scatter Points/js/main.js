@@ -51,19 +51,14 @@ const timeLabel = g
   .attr("text-anchor", "middle")
   .text("1800");
 
-// const maxXDomain = d3.max(fullData, (d) => {
-//   // getting max income in a year of all countries to get max income all time
-//   const maxInAYear = d3.max(d.countries, (country) => country.income);
-//   return maxInAYear;
-// });
-
 // Setting up scales:
 const x = d3.scaleLog().base(10).range([0, WIDTH]).domain([142, 180000]);
 const y = d3.scaleLinear().range([HEIGHT, 0]).domain([0, 90]);
 const ordinalScale = d3
   .scaleOrdinal()
-  .range(d3.schemeAccent)
+  .range(d3.schemePastel1)
   .domain(["europe", "asia", "americas", "africa"]);
+const radiusScale = d3.scaleLinear().range([0, 10]);
 
 // Setting up axes:
 const xAxisGroup = g
@@ -74,11 +69,22 @@ const xAxisGroup = g
 const yAxisGroup = g.append("g").attr("class", "y axis");
 
 d3.json("data/data.json").then(function (data) {
-  let counter = 0;
-
   data.forEach((d) => {
     d.year = Number(d.year);
   });
+
+  console.log(data);
+
+  let counter = 0;
+
+  // Building Scale for circle radius
+  const maxPopulation = d3.max(data, (d) => {
+    // getting max population in a year of all countries to get max population all time
+    const maxInAYear = d3.max(d.countries, (country) => country.population);
+    return maxInAYear;
+  });
+
+  radiusScale.domain([0, maxPopulation]);
 
   d3.interval(() => {
     update(data[counter], data);
@@ -97,7 +103,7 @@ function update(data) {
 
   const xAxisCall = d3
     .axisBottom(x)
-    .tickValues([400, 4000, 40000])
+    .tickValues([500, 5000, 50000])
     .tickFormat(d3.format("$"));
   xAxisGroup.transition(transit).call(xAxisCall);
 
@@ -113,6 +119,7 @@ function update(data) {
   // UPDATE old elements present in new data
   rects
     .transition(transit)
+    .attr("r", (d) => radiusScale(d.population) * 3.14 + 5)
     .attr("cy", (d) => {
       return y(d.life_exp);
     })
@@ -120,13 +127,25 @@ function update(data) {
       const returnValue = x(d.income) || 0;
       return returnValue;
     })
-    .attr("fill", (d) => ordinalScale(d.continent));
+    .attr("fill", (d) => {
+      if (!d.income || !d.life_exp) {
+        return "none";
+      } else {
+        return ordinalScale(d.continent);
+      }
+    });
 
   // ENTER new elements present in new data...
   rects
     .enter()
     .append("circle")
-    .attr("fill", (d) => ordinalScale(d.continent))
+    .attr("fill", (d) => {
+      if (!d.income || !d.life_exp) {
+        return "none";
+      } else {
+        return ordinalScale(d.continent);
+      }
+    })
     .attr("cx", (d) => {
       const returnValue = x(d.income) || 0;
       return returnValue;
@@ -134,7 +153,7 @@ function update(data) {
     .attr("cy", (d) => {
       return y(d.life_exp);
     })
-    .attr("r", 5);
+    .attr("r", (d) => radiusScale(d.population) * 3.14 + 5);
 
   timeLabel.text(String(data.year));
 }
