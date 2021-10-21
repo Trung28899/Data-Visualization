@@ -8,6 +8,10 @@ const MARGIN = { LEFT: 100, RIGHT: 10, TOP: 10, BOTTOM: 100 };
 const WIDTH = 800 - MARGIN.LEFT - MARGIN.RIGHT;
 const HEIGHT = 500 - MARGIN.TOP - MARGIN.BOTTOM;
 
+let counter = 0;
+let interval;
+let formattedData;
+
 // Setting up the chart area
 const svg = d3
   .select("#chart-area")
@@ -121,8 +125,6 @@ d3.json("data/data.json").then(function (data) {
     d.year = Number(d.year);
   });
 
-  let counter = 0;
-
   // Building Scale for circle radius
   const maxPopulation = d3.max(data, (d) => {
     // getting max population in a year of all countries to get max population all time
@@ -131,21 +133,55 @@ d3.json("data/data.json").then(function (data) {
   });
 
   radiusScale.domain([0, maxPopulation]);
-
-  d3.interval(() => {
-    update(data[counter], data);
-    if (counter < data.length - 1) {
-      counter++;
-    } else {
-      counter = 0;
-    }
-  }, 1000);
+  formattedData = data;
 
   update(data[counter], data);
 });
 
+function step(updateFilter) {
+  if (!updateFilter) {
+    if (counter < formattedData.length - 1) {
+      counter++;
+    } else {
+      counter = 0;
+    }
+  }
+  update(formattedData[counter], formattedData);
+}
+
+// EVENT Listening for the Play / Pause Button
+$("#play-button").on("click", function () {
+  const button = $(this);
+
+  if (button.text() === "Play") {
+    button.text("Pause");
+    interval = setInterval(step, 100);
+  } else {
+    button.text("Play");
+    // This is how to stop the interval
+    clearInterval(interval);
+  }
+});
+
+// EVENT Listening for the Reset Button
+$("#reset-button").on("click", function () {
+  counter = 0;
+  $("#play-button").text("Play");
+  // This is how to stop the interval
+  clearInterval(interval);
+  timeLabel.text(String(1800));
+  update(formattedData[0], formattedData);
+});
+
+// Event listening for the Continent update
+$("#continent-select").on("change", function () {
+  step(true);
+});
+
 function update(data) {
   const transit = d3.transition().duration(80);
+
+  const continent = $("#continent-select").val();
 
   const xAxisCall = d3
     .axisBottom(x)
@@ -176,6 +212,8 @@ function update(data) {
     .attr("fill", (d) => {
       if (!d.income || !d.life_exp) {
         return "none";
+      } else if (d.continent !== continent && continent !== "all") {
+        return "none";
       } else {
         return ordinalScale(d.continent);
       }
@@ -187,6 +225,8 @@ function update(data) {
     .append("circle")
     .attr("fill", (d) => {
       if (!d.income || !d.life_exp) {
+        return "none";
+      } else if (d.continent !== continent && continent !== "all") {
         return "none";
       } else {
         return ordinalScale(d.continent);
